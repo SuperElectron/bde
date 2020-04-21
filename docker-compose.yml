@@ -1,4 +1,5 @@
-version: '2' 
+version: '3'
+
 services:
   namenode:
     image: bde2020/hadoop-namenode:1.1.0-hadoop2.8-java8
@@ -11,6 +12,7 @@ services:
       - ./hadoop.env
     ports:
       - 50070:50070
+
   datanode:
     image: bde2020/hadoop-datanode:1.1.0-hadoop2.8-java8
     depends_on: 
@@ -21,24 +23,32 @@ services:
       - ./hadoop.env
     ports:
       - 50075:50075
+
   spark-master:
     image: bde2020/spark-master:2.1.0-hadoop2.8-hive-java8
     container_name: spark-master
+    environment:
+      - INIT_DAEMON_BASE_URI=false
     ports:
       - 8080:8080
       - 7077:7077
     env_file:
       - ./hadoop.env
+
   spark-worker:
-    image: bde2020/spark-worker:2.1.0-hadoop2.8-hive-java8
+    image: bde2020/spark-worker:2.1.0-hadoop2.8-hive-java8 # hadoop 2.7
     depends_on:
       - spark-master
     environment:
+      - INIT_DAEMON_BASE_URI=false
       - SPARK_MASTER=spark://spark-master:7077
-    ports:
-      - 8081:8081
+    expose:
+      - 8881
+      - 8882
+      - 8883
     env_file:
       - ./hadoop.env
+
   spark-notebook:
     image: bde2020/spark-notebook:2.1.0-hadoop2.8-hive
     container_name: spark-notebook
@@ -46,9 +56,23 @@ services:
       - ./hadoop.env
     ports:
       - 9001:9001
+
   hue:
     image: bde2020/hdfs-filebrowser:3.11
     ports:
       - 8088:8088
     environment:
       - NAMENODE_HOST=namenode
+
+  reverse-proxy:
+    image: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:81"
+    ports:
+      - "81:81"     # The HTTP port
+      - "8000:8000" # The Web UI (enabled by --api)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" # So that Traefik can listen to the Docker events

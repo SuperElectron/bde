@@ -3,11 +3,14 @@
 # How to use HDFS/Spark Workbench
 
 To start an HDFS/Spark Workbench:
+
 ```
-    docker-compose up -d
+    make start
 ```
 
-docker-compose does not work to scale up spark-workers, for distributed setup see [swarm folder](./swarm) 
+```bash
+    make start-scale-spark
+```
 
 ## Starting workbench with Hive support
 
