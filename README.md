@@ -81,3 +81,13 @@ res0: Long = 1
 scala> f1.collect()
 res1: Array[String] = Array(hello world hello docker)
 ```
+
+## Count Example for Spark-Submit
+
+```bash
+docker exec -it spark-master bash -c "./spark/bin/spark-submit --master local[*] /spark/stuff/app.py" | grep -E "world|docker|hello"
+
+world: 1
+docker: 1
+hello: 2
+```
