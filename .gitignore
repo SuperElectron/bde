@@ -2,4 +2,5 @@ data/
 example/SparkWriteApplication.jar
 .idea
 .vscode
-
+spark-master/python-streaming
+spark-master/scala-streaming

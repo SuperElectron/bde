@@ -34,7 +34,7 @@ __setup HDFS__
 ```
 docker exec -it namenode bash -c "\
 mkdir -p /user/root \
-echo "Hello Docker Docker Hello" > /user/root/f1.txt \
+echo "Hello Docker Docker Hello" > /user/root/workcount.txt \
 hdfs dfs -put ./user/* /user"
 ```
 
@@ -72,7 +72,7 @@ Type :help for more information.
 - now you can read the text file in
 ```bash
 
-scala> val f1 = spark.read.textFile("f1.txt")
+scala> val f1 = spark.read.textFile("wordcount.txt")
 f1: org.apache.spark.sql.Dataset[String] = [value: string]
 
 scala> f1.count()
@@ -84,10 +84,23 @@ res1: Array[String] = Array(hello world hello docker)
 
 ## Count Example for Spark-Submit
 
-```bash
-docker exec -it spark-master bash -c "./spark/bin/spark-submit --master local[*] /spark/stuff/app.py" | grep -E "world|docker|hello"
+__example-wordcount.py__
 
-world: 1
-docker: 1
-hello: 2
+- you must have `wordcount.txt` available in HDFS!
+- add it here: http://localhost:8088/filebrowser/view=/user/root
+
+```bash
+make example-wordcount
+
+world: 2
+docker: 2
+```
+
+__example-json.py__
+
+- you must have "schema.json" available in HDFS!
+- add it here: http://localhost:8088/filebrowser/view=/user/root
+
+```bash
+make example-json-schema
 ```
